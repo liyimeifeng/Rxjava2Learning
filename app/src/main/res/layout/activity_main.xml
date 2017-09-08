@@ -13,12 +13,30 @@
 
 
     <Button
-        android:id="@+id/button_getweather"
+        android:text="@string/button_text"
+        android:background="@color/colorButton"
+        android:id="@+id/activity_main_button_getWeather"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
     <TextView
-        android:id="@+id/text_weatherInfo"
+        android:id="@+id/activity_main_textview_weatherDescription"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Hello World!" />
+    <TextView
+        android:id="@+id/activity_main_text_temperature"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+    <TextView
+        android:id="@+id/activity_main_text_pressure"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+    <TextView
+        android:id="@+id/activity_main_text_humidity"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+    <TextView
+        android:id="@+id/activity_main_text_sunset"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
 </LinearLayout>

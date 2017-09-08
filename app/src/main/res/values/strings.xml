@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">外热</string>
+    <string name="button_text">获取天气</string>
 </resources>
