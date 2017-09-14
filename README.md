@@ -57,15 +57,25 @@
   };
   
 ###操作符简述
+* creat
+* just
 * map
 * flatmap
 * concatmap
-* take（int value）只发送指定数量的observable
-* timer     延迟发送
-* buffer
 * interval
 * filter
 * zip   用于合并事件，两两配对，最终配对出来的observable发射事件数目只和少的那个相同
+* take（int value）只发送指定数量的observable
+* timer     延迟发送
+* buffer
+* reduce
+* simple
+* skip
+* scan
+* concat
+* defer
+* merge
+* last
 
 ###关于背压backpressure
 #####先从场景出发
