@@ -15,6 +15,7 @@ import com.li.rxjava2.bean.WeatherData;
 import com.li.rxjava2.httpRequest.RetrofitWrapper;
 
 import java.text.SimpleDateFormat;
+import java.util.concurrent.TimeUnit;
 
 import javax.security.auth.login.LoginException;
 
@@ -30,6 +31,7 @@ import io.reactivex.Observer;
 import io.reactivex.Scheduler;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Function;
 import io.reactivex.functions.Predicate;
 import io.reactivex.schedulers.Schedulers;
@@ -68,9 +70,23 @@ public class MainActivity extends AppCompatActivity {
     public void onclick(View view) {
         switch (view.getId()) {
             case R.id.activity_main_button_getWeather:
-                getWeatherInfo();
+//                getWeatherInfo();
+                backPressure();
                 break;
         }
+    }
+
+
+    private void backPressure(){
+        Observable.interval(1, TimeUnit.MILLISECONDS)
+                .subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Consumer<Long>() {
+                    @Override
+                    public void accept(Long aLong) throws Exception {
+
+                    }
+                });
     }
 
     /**
