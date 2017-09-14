@@ -13,6 +13,7 @@ import com.rxjava2.android.samples.utils.AppConstant;
 import io.reactivex.Observable;
 import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.annotations.NonNull;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.BiFunction;
 import io.reactivex.schedulers.Schedulers;
@@ -40,7 +41,7 @@ public class ScanExampleActivity extends AppCompatActivity {
 
     /* Using scan operator, it sends also the previous result */
     private void doSomeWork() {
-        getObservable()
+        Observable.just(1,2,3,4,5)
                 // Run on a background thread
                 .subscribeOn(Schedulers.io())
                 // Be notified on the main thread
@@ -48,43 +49,61 @@ public class ScanExampleActivity extends AppCompatActivity {
                 .scan(new BiFunction<Integer, Integer, Integer>() {
                     @Override
                     public Integer apply(Integer int1, Integer int2) throws Exception {
+                        Log.e(TAG, "apply: int1--->" + int1 + "--int2-->" + int2 );
                         return int1 + int2;
                     }
                 })
-                .subscribe(getObserver());
+                .subscribe(new Observer<Integer>() {
+                    @Override
+                    public void onSubscribe(@NonNull Disposable d) {
+                        Log.d(TAG, " onSubscribe : " + d.isDisposed());
+
+                    }
+
+                    @Override
+                    public void onNext(@NonNull Integer integer) {
+                        textView.append(" onNext : value : " + integer);
+                        textView.append(AppConstant.LINE_SEPARATOR);
+                        Log.d(TAG, " onNext value : " + integer);
+                    }
+
+                    @Override
+                    public void onError(@NonNull Throwable e) {
+                        textView.append(" onError : " + e.getMessage());
+                        textView.append(AppConstant.LINE_SEPARATOR);
+                        Log.d(TAG, " onError : " + e.getMessage());
+                    }
+
+                    @Override
+                    public void onComplete() {
+                        textView.append(" onComplete");
+                        textView.append(AppConstant.LINE_SEPARATOR);
+                        Log.d(TAG, " onComplete");
+                    }
+                });
     }
 
-    private Observable<Integer> getObservable() {
-        return Observable.just(1, 2, 3, 4, 5);
-    }
 
     private Observer<Integer> getObserver() {
         return new Observer<Integer>() {
 
             @Override
             public void onSubscribe(Disposable d) {
-                Log.d(TAG, " onSubscribe : " + d.isDisposed());
             }
 
             @Override
             public void onNext(Integer value) {
-                textView.append(" onNext : value : " + value);
-                textView.append(AppConstant.LINE_SEPARATOR);
-                Log.d(TAG, " onNext value : " + value);
+
             }
 
             @Override
             public void onError(Throwable e) {
-                textView.append(" onError : " + e.getMessage());
-                textView.append(AppConstant.LINE_SEPARATOR);
-                Log.d(TAG, " onError : " + e.getMessage());
+
             }
 
             @Override
             public void onComplete() {
-                textView.append(" onComplete");
-                textView.append(AppConstant.LINE_SEPARATOR);
-                Log.d(TAG, " onComplete");
+
             }
         };
     }

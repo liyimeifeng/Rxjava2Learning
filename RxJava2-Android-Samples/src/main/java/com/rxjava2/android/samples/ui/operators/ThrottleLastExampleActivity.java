@@ -17,6 +17,7 @@ import io.reactivex.ObservableEmitter;
 import io.reactivex.ObservableOnSubscribe;
 import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.annotations.NonNull;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 
@@ -51,17 +52,7 @@ public class ThrottleLastExampleActivity extends AppCompatActivity {
     * last the element in the interval of 500 millis
     */
     private void doSomeWork() {
-        getObservable()
-                .throttleLast(500, TimeUnit.MILLISECONDS)
-                // Run on a background thread
-                .subscribeOn(Schedulers.io())
-                // Be notified on the main thread
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(getObserver());
-    }
-
-    private Observable<Integer> getObservable() {
-        return Observable.create(new ObservableOnSubscribe<Integer>() {
+        Observable.create(new ObservableOnSubscribe<Integer>() {
             @Override
             public void subscribe(ObservableEmitter<Integer> emitter) throws Exception {
                 // send events with simulated time wait
@@ -80,41 +71,43 @@ public class ThrottleLastExampleActivity extends AppCompatActivity {
                 Thread.sleep(510);
                 emitter.onComplete();
             }
-        });
+        })
+                .throttleLast(500, TimeUnit.MILLISECONDS)
+                // Run on a background thread
+                .subscribeOn(Schedulers.io())
+                // Be notified on the main thread
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Observer<Integer>() {
+                    @Override
+                    public void onSubscribe(Disposable d) {
+                        Log.d(TAG, " onSubscribe : " + d.isDisposed());
+                    }
+
+                    @Override
+                    public void onNext(Integer value) {
+                        textView.append(" onNext : ");
+                        textView.append(AppConstant.LINE_SEPARATOR);
+                        textView.append(" value : " + value);
+                        textView.append(AppConstant.LINE_SEPARATOR);
+                        Log.d(TAG, " onNext ");
+                        Log.d(TAG, " value : " + value);
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        textView.append(" onError : " + e.getMessage());
+                        textView.append(AppConstant.LINE_SEPARATOR);
+                        Log.d(TAG, " onError : " + e.getMessage());
+                    }
+
+                    @Override
+                    public void onComplete() {
+                        textView.append(" onComplete");
+                        textView.append(AppConstant.LINE_SEPARATOR);
+                        Log.d(TAG, " onComplete");
+                    }
+                });
     }
 
-    private Observer<Integer> getObserver() {
-        return new Observer<Integer>() {
-
-            @Override
-            public void onSubscribe(Disposable d) {
-                Log.d(TAG, " onSubscribe : " + d.isDisposed());
-            }
-
-            @Override
-            public void onNext(Integer value) {
-                textView.append(" onNext : ");
-                textView.append(AppConstant.LINE_SEPARATOR);
-                textView.append(" value : " + value);
-                textView.append(AppConstant.LINE_SEPARATOR);
-                Log.d(TAG, " onNext ");
-                Log.d(TAG, " value : " + value);
-            }
-
-            @Override
-            public void onError(Throwable e) {
-                textView.append(" onError : " + e.getMessage());
-                textView.append(AppConstant.LINE_SEPARATOR);
-                Log.d(TAG, " onError : " + e.getMessage());
-            }
-
-            @Override
-            public void onComplete() {
-                textView.append(" onComplete");
-                textView.append(AppConstant.LINE_SEPARATOR);
-                Log.d(TAG, " onComplete");
-            }
-        };
-    }
 
 }

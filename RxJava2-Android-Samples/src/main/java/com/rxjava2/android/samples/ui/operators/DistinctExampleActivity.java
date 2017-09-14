@@ -13,6 +13,7 @@ import com.rxjava2.android.samples.utils.AppConstant;
 
 import io.reactivex.Observable;
 import io.reactivex.Observer;
+import io.reactivex.annotations.NonNull;
 import io.reactivex.disposables.Disposable;
 
 /**
@@ -44,40 +45,31 @@ public class DistinctExampleActivity extends AppCompatActivity {
      */
     private void doSomeWork() {
 
-        getObservable()
+        Observable.just(1,2,1,1,2,3,4,6,4)
                 .distinct()
-                .subscribe(getObserver());
+                .subscribe(new Observer<Integer>() {
+                    @Override
+                    public void onSubscribe(Disposable d) {
+                        Log.d(TAG, " onSubscribe : " + d.isDisposed());
+                    }
+
+                    @Override
+                    public void onNext(Integer value) {
+                        textView.append(" onNext : value : " + value);
+                        textView.append(AppConstant.LINE_SEPARATOR);
+                        Log.d(TAG, " onNext value : " + value);
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        Log.d(TAG, " onError : " + e.getMessage());
+                    }
+
+                    @Override
+                    public void onComplete() {
+                        Log.d(TAG, " onComplete");
+                    }
+                });
     }
 
-    private Observable<Integer> getObservable() {
-        return Observable.just(1, 2, 1, 1, 2, 3, 4, 6, 4);
-    }
-
-
-    private Observer<Integer> getObserver() {
-        return new Observer<Integer>() {
-
-            @Override
-            public void onSubscribe(Disposable d) {
-                Log.d(TAG, " onSubscribe : " + d.isDisposed());
-            }
-
-            @Override
-            public void onNext(Integer value) {
-                textView.append(" onNext : value : " + value);
-                textView.append(AppConstant.LINE_SEPARATOR);
-                Log.d(TAG, " onNext value : " + value);
-            }
-
-            @Override
-            public void onError(Throwable e) {
-                Log.d(TAG, " onError : " + e.getMessage());
-            }
-
-            @Override
-            public void onComplete() {
-                Log.d(TAG, " onComplete");
-            }
-        };
-    }
 }

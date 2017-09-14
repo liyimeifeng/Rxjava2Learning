@@ -14,6 +14,7 @@ import java.util.List;
 
 import io.reactivex.Observable;
 import io.reactivex.Observer;
+import io.reactivex.annotations.NonNull;
 import io.reactivex.disposables.Disposable;
 
 /**
@@ -45,7 +46,6 @@ public class BufferExampleActivity extends AppCompatActivity {
      */
     private void doSomeWork() {
 
-        Observable<List<String>> buffered = getObservable().buffer(3, 1);
 
         // 3 means,  it takes max of three from its start index and create list
         // 1 means, it jumps one step every time
@@ -56,36 +56,29 @@ public class BufferExampleActivity extends AppCompatActivity {
         // 4 - four, five
         // 5 - five
 
-        buffered.subscribe(getObserver());
-    }
-
-    private Observable<String> getObservable() {
-        return Observable.just("one", "two", "three", "four", "five");
-    }
-
-    private Observer<List<String>> getObserver() {
-        return new Observer<List<String>>() {
-
+        Observable.just("one", "two", "three", "four", "five")
+                .buffer(3, 1)
+                .subscribe(new Observer<List<String>>() {
             @Override
-            public void onSubscribe(Disposable d) {
+            public void onSubscribe(@NonNull Disposable d) {
                 Log.d(TAG, " onSubscribe : " + d.isDisposed());
+
             }
 
             @Override
-            public void onNext(List<String> stringList) {
-                textView.append(" onNext size : " + stringList.size());
+            public void onNext(@NonNull List<String> strings) {
+                textView.append(" onNext size : " + strings.size());
                 textView.append(AppConstant.LINE_SEPARATOR);
-                Log.d(TAG, " onNext : size :" + stringList.size());
-                for (String value : stringList) {
+                Log.d(TAG, " onNext : size :" + strings.size());
+                for (String value : strings) {
                     textView.append(" value : " + value);
                     textView.append(AppConstant.LINE_SEPARATOR);
                     Log.d(TAG, " : value :" + value);
                 }
-
             }
 
             @Override
-            public void onError(Throwable e) {
+            public void onError(@NonNull Throwable e) {
                 textView.append(" onError : " + e.getMessage());
                 textView.append(AppConstant.LINE_SEPARATOR);
                 Log.d(TAG, " onError : " + e.getMessage());
@@ -97,7 +90,11 @@ public class BufferExampleActivity extends AppCompatActivity {
                 textView.append(AppConstant.LINE_SEPARATOR);
                 Log.d(TAG, " onComplete");
             }
-        };
+        });
+    }
+
+    private Observable<String> getObservable() {
+        return Observable.just("one", "two", "three", "four", "five");
     }
 
 

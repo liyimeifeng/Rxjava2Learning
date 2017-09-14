@@ -11,6 +11,7 @@ import com.rxjava2.android.samples.R;
 import com.rxjava2.android.samples.utils.AppConstant;
 
 import io.reactivex.Observer;
+import io.reactivex.annotations.NonNull;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.subjects.ReplaySubject;
 
@@ -46,25 +47,7 @@ public class ReplaySubjectExampleActivity extends AppCompatActivity {
 
         ReplaySubject<Integer> source = ReplaySubject.create();
 
-        source.subscribe(getFirstObserver()); // it will get 1, 2, 3, 4
-
-        source.onNext(1);
-        source.onNext(2);
-        source.onNext(3);
-        source.onNext(4);
-        source.onComplete();
-
-        /*
-         * it will emit 1, 2, 3, 4 for second observer also as we have used replay
-         */
-        source.subscribe(getSecondObserver());
-
-    }
-
-
-    private Observer<Integer> getFirstObserver() {
-        return new Observer<Integer>() {
-
+        source.subscribe(new Observer<Integer>() {
             @Override
             public void onSubscribe(Disposable d) {
                 Log.d(TAG, " First onSubscribe : " + d.isDisposed());
@@ -90,12 +73,18 @@ public class ReplaySubjectExampleActivity extends AppCompatActivity {
                 textView.append(AppConstant.LINE_SEPARATOR);
                 Log.d(TAG, " First onComplete");
             }
-        };
-    }
+        }); // it will get 1, 2, 3, 4
 
-    private Observer<Integer> getSecondObserver() {
-        return new Observer<Integer>() {
+        source.onNext(1);
+        source.onNext(2);
+        source.onNext(3);
+        source.onNext(4);
+        source.onComplete();
 
+        /*
+         * it will emit 1, 2, 3, 4 for second observer also as we have used replay
+         */
+        source.subscribe(new Observer<Integer>() {
             @Override
             public void onSubscribe(Disposable d) {
                 textView.append(" Second onSubscribe : isDisposed :" + d.isDisposed());
@@ -123,8 +112,10 @@ public class ReplaySubjectExampleActivity extends AppCompatActivity {
                 textView.append(AppConstant.LINE_SEPARATOR);
                 Log.d(TAG, " Second onComplete");
             }
-        };
+        });
+
     }
+
 
 
 }

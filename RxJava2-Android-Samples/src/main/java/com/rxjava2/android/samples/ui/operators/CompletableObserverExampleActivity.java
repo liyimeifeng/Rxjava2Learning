@@ -15,6 +15,7 @@ import java.util.concurrent.TimeUnit;
 import io.reactivex.Completable;
 import io.reactivex.CompletableObserver;
 import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.annotations.NonNull;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 
@@ -47,35 +48,31 @@ public class CompletableObserverExampleActivity extends AppCompatActivity {
      */
     private void doSomeWork() {
         Completable completable = Completable.timer(1000, TimeUnit.MILLISECONDS);
-
-        completable
+        Completable.timer(5000,TimeUnit.MILLISECONDS)
                 .subscribeOn(Schedulers.io())
                 // Be notified on the main thread
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(getCompletableObserver());
-    }
+                .subscribe(new CompletableObserver() {
+                    @Override
+                    public void onSubscribe(@NonNull Disposable d) {
+                        Log.d(TAG, " onSubscribe : " + d.isDisposed());
 
-    private CompletableObserver getCompletableObserver() {
-        return new CompletableObserver() {
-            @Override
-            public void onSubscribe(Disposable d) {
-                Log.d(TAG, " onSubscribe : " + d.isDisposed());
-            }
+                    }
 
-            @Override
-            public void onComplete() {
-                textView.append(" onComplete");
-                textView.append(AppConstant.LINE_SEPARATOR);
-                Log.d(TAG, " onComplete");
-            }
+                    @Override
+                    public void onComplete() {
+                        textView.append(" onComplete");
+                        textView.append(AppConstant.LINE_SEPARATOR);
+                        Log.d(TAG, " onComplete");
+                    }
 
-            @Override
-            public void onError(Throwable e) {
-                textView.append(" onError : " + e.getMessage());
-                textView.append(AppConstant.LINE_SEPARATOR);
-                Log.d(TAG, " onError : " + e.getMessage());
-            }
-        };
+                    @Override
+                    public void onError(@NonNull Throwable e) {
+                        textView.append(" onError : " + e.getMessage());
+                        textView.append(AppConstant.LINE_SEPARATOR);
+                        Log.d(TAG, " onError : " + e.getMessage());
+                    }
+                });
     }
 
 }

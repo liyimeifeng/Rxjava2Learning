@@ -11,7 +11,9 @@ import com.rxjava2.android.samples.R;
 import com.rxjava2.android.samples.utils.AppConstant;
 
 import io.reactivex.Observer;
+import io.reactivex.annotations.NonNull;
 import io.reactivex.disposables.Disposable;
+import io.reactivex.internal.operators.observable.ObserverResourceWrapper;
 import io.reactivex.observables.ConnectableObservable;
 import io.reactivex.subjects.PublishSubject;
 
@@ -48,25 +50,7 @@ public class ReplayExampleActivity extends AppCompatActivity {
         ConnectableObservable<Integer> connectableObservable = source.replay(3); // bufferSize = 3 to retain 3 values to replay
         connectableObservable.connect(); // connecting the connectableObservable
 
-        connectableObservable.subscribe(getFirstObserver());
-
-        source.onNext(1);
-        source.onNext(2);
-        source.onNext(3);
-        source.onNext(4);
-        source.onComplete();
-
-        /*
-         * it will emit 2, 3, 4 as (count = 3), retains the 3 values for replay
-         */
-        connectableObservable.subscribe(getSecondObserver());
-
-    }
-
-
-    private Observer<Integer> getFirstObserver() {
-        return new Observer<Integer>() {
-
+        connectableObservable.subscribe(new Observer<Integer>() {
             @Override
             public void onSubscribe(Disposable d) {
                 Log.d(TAG, " First onSubscribe : " + d.isDisposed());
@@ -92,28 +76,34 @@ public class ReplayExampleActivity extends AppCompatActivity {
                 textView.append(AppConstant.LINE_SEPARATOR);
                 Log.d(TAG, " First onComplete");
             }
-        };
-    }
+        });
 
-    private Observer<Integer> getSecondObserver() {
-        return new Observer<Integer>() {
+        source.onNext(1);
+        source.onNext(2);
+        source.onNext(3);
+        source.onNext(4);
+        source.onComplete();
 
+        /*
+         * it will emit 2, 3, 4 as (count = 3), retains the 3 values for replay
+         */
+        connectableObservable.subscribe(new Observer<Integer>() {
             @Override
-            public void onSubscribe(Disposable d) {
+            public void onSubscribe(@NonNull Disposable d) {
                 textView.append(" Second onSubscribe : isDisposed :" + d.isDisposed());
                 Log.d(TAG, " Second onSubscribe : " + d.isDisposed());
                 textView.append(AppConstant.LINE_SEPARATOR);
             }
 
             @Override
-            public void onNext(Integer value) {
-                textView.append(" Second onNext : value : " + value);
+            public void onNext(@NonNull Integer integer) {
+                textView.append(" Second onNext : value : " + integer);
                 textView.append(AppConstant.LINE_SEPARATOR);
-                Log.d(TAG, " Second onNext value : " + value);
+                Log.d(TAG, " Second onNext value : " + integer);
             }
 
             @Override
-            public void onError(Throwable e) {
+            public void onError(@NonNull Throwable e) {
                 textView.append(" Second onError : " + e.getMessage());
                 Log.d(TAG, " Second onError : " + e.getMessage());
             }
@@ -123,8 +113,8 @@ public class ReplayExampleActivity extends AppCompatActivity {
                 textView.append(" Second onComplete");
                 Log.d(TAG, " Second onComplete");
             }
-        };
-    }
+        });
 
+    }
 
 }

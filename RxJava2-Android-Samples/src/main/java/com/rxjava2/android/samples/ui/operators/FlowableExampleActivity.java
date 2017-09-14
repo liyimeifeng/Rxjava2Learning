@@ -12,6 +12,7 @@ import com.rxjava2.android.samples.utils.AppConstant;
 
 import io.reactivex.Flowable;
 import io.reactivex.SingleObserver;
+import io.reactivex.annotations.NonNull;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.BiFunction;
 
@@ -44,38 +45,35 @@ public class FlowableExampleActivity extends AppCompatActivity {
      */
     private void doSomeWork() {
 
-        Flowable<Integer> observable = Flowable.just(1, 2, 3, 4);
-
-        observable.reduce(50, new BiFunction<Integer, Integer, Integer>() {
+        // reduce对所有数据进行处理，最终emit一个数据出来
+        Flowable.just(1,2,3,4).reduce(50, new BiFunction<Integer, Integer, Integer>() {
             @Override
             public Integer apply(Integer t1, Integer t2) {
+                Log.e(TAG, "apply: t1---->" + t1 + "--t2---> " + t2 );
                 return t1 + t2;
             }
-        }).subscribe(getObserver());
-
-    }
-
-    private SingleObserver<Integer> getObserver() {
-
-        return new SingleObserver<Integer>() {
+        }).subscribe(new SingleObserver<Integer>() {
             @Override
-            public void onSubscribe(Disposable d) {
+            public void onSubscribe(@NonNull Disposable d) {
                 Log.d(TAG, " onSubscribe : " + d.isDisposed());
+
             }
 
             @Override
-            public void onSuccess(Integer value) {
-                textView.append(" onSuccess : value : " + value);
+            public void onSuccess(@NonNull Integer integer) {
+                textView.append(" onSuccess : value : " + integer);
                 textView.append(AppConstant.LINE_SEPARATOR);
-                Log.d(TAG, " onSuccess : value : " + value);
+                Log.d(TAG, " onSuccess : value : " + integer);
             }
 
             @Override
-            public void onError(Throwable e) {
+            public void onError(@NonNull Throwable e) {
                 textView.append(" onError : " + e.getMessage());
                 textView.append(AppConstant.LINE_SEPARATOR);
                 Log.d(TAG, " onError : " + e.getMessage());
             }
-        };
+        });
+
     }
+
 }

@@ -11,6 +11,7 @@ import com.rxjava2.android.samples.R;
 import com.rxjava2.android.samples.utils.AppConstant;
 
 import io.reactivex.Observer;
+import io.reactivex.annotations.NonNull;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.subjects.AsyncSubject;
 
@@ -47,26 +48,7 @@ public class AsyncSubjectExampleActivity extends AppCompatActivity {
 
         AsyncSubject<Integer> source = AsyncSubject.create();
 
-        source.subscribe(getFirstObserver()); // it will emit only 4 and onComplete
-
-        source.onNext(1);
-        source.onNext(2);
-        source.onNext(3);
-
-        /*
-         * it will emit 4 and onComplete for second observer also.
-         */
-        source.subscribe(getSecondObserver());
-
-        source.onNext(4);
-        source.onComplete();
-
-    }
-
-
-    private Observer<Integer> getFirstObserver() {
-        return new Observer<Integer>() {
-
+        source.subscribe(new Observer<Integer>() {
             @Override
             public void onSubscribe(Disposable d) {
                 Log.d(TAG, " First onSubscribe : " + d.isDisposed());
@@ -92,12 +74,16 @@ public class AsyncSubjectExampleActivity extends AppCompatActivity {
                 textView.append(AppConstant.LINE_SEPARATOR);
                 Log.d(TAG, " First onComplete");
             }
-        };
-    }
+        }); // it will emit only 4 and onComplete
 
-    private Observer<Integer> getSecondObserver() {
-        return new Observer<Integer>() {
+        source.onNext(1);
+        source.onNext(2);
+        source.onNext(3);
 
+        /*
+         * it will emit 4 and onComplete for second observer also.
+         */
+        source.subscribe(new Observer<Integer>() {
             @Override
             public void onSubscribe(Disposable d) {
                 textView.append(" Second onSubscribe : isDisposed :" + d.isDisposed());
@@ -125,8 +111,15 @@ public class AsyncSubjectExampleActivity extends AppCompatActivity {
                 textView.append(AppConstant.LINE_SEPARATOR);
                 Log.d(TAG, " Second onComplete");
             }
-        };
+
+        });
+
+        source.onNext(4);
+        source.onComplete();
+
     }
+
+
 
 
 }

@@ -12,6 +12,7 @@ import com.rxjava2.android.samples.utils.AppConstant;
 
 import io.reactivex.Observable;
 import io.reactivex.Observer;
+import io.reactivex.annotations.NonNull;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Predicate;
 
@@ -52,7 +53,37 @@ public class FilterExampleActivity extends AppCompatActivity {
                         return integer % 2 == 0;
                     }
                 })
-                .subscribe(getObserver());
+                .subscribe(new Observer<Integer>() {
+                    @Override
+                    public void onSubscribe(@NonNull Disposable d) {
+                        Log.d(TAG, " onSubscribe : " + d.isDisposed());
+
+                    }
+
+                    @Override
+                    public void onNext(@NonNull Integer integer) {
+                        textView.append(" onNext : ");
+                        textView.append(AppConstant.LINE_SEPARATOR);
+                        textView.append(" value : " + integer);
+                        textView.append(AppConstant.LINE_SEPARATOR);
+                        Log.d(TAG, " onNext ");
+                        Log.d(TAG, " value : " + integer);
+                    }
+
+                    @Override
+                    public void onError(@NonNull Throwable e) {
+                        textView.append(" onError : " + e.getMessage());
+                        textView.append(AppConstant.LINE_SEPARATOR);
+                        Log.d(TAG, " onError : " + e.getMessage());
+                    }
+
+                    @Override
+                    public void onComplete() {
+                        textView.append(" onComplete");
+                        textView.append(AppConstant.LINE_SEPARATOR);
+                        Log.d(TAG, " onComplete");
+                    }
+                });
     }
 
 
@@ -61,31 +92,21 @@ public class FilterExampleActivity extends AppCompatActivity {
 
             @Override
             public void onSubscribe(Disposable d) {
-                Log.d(TAG, " onSubscribe : " + d.isDisposed());
             }
 
             @Override
             public void onNext(Integer value) {
-                textView.append(" onNext : ");
-                textView.append(AppConstant.LINE_SEPARATOR);
-                textView.append(" value : " + value);
-                textView.append(AppConstant.LINE_SEPARATOR);
-                Log.d(TAG, " onNext ");
-                Log.d(TAG, " value : " + value);
+
             }
 
             @Override
             public void onError(Throwable e) {
-                textView.append(" onError : " + e.getMessage());
-                textView.append(AppConstant.LINE_SEPARATOR);
-                Log.d(TAG, " onError : " + e.getMessage());
+
             }
 
             @Override
             public void onComplete() {
-                textView.append(" onComplete");
-                textView.append(AppConstant.LINE_SEPARATOR);
-                Log.d(TAG, " onComplete");
+
             }
         };
     }
