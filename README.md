@@ -55,6 +55,20 @@
 
       }
   };
+
+###各种观察者
+* Observable
+* Single
+* Completable
+* Behavisor
+* **Flowable**
+* AsyncSubject
+* ReplaySubject
+* PublishSubject
+
+###被观察者
+* Observer
+* Subcriber
   
 ###操作符简述
 * creat
@@ -76,6 +90,12 @@
 * defer
 * merge
 * last
+* debounce
+* windows
+* distinct
+* throttleFirst
+* throttleLast
+
 
 ###关于背压backpressure
 #####先从场景出发
