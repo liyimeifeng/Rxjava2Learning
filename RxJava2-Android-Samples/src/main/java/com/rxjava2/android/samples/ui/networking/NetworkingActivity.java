@@ -5,6 +5,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.util.Pair;
 import android.view.View;
+import android.widget.Button;
 
 import com.rx2androidnetworking.Rx2AndroidNetworking;
 import com.rxjava2.android.samples.R;
@@ -16,6 +17,9 @@ import com.rxjava2.android.samples.utils.Utils;
 import java.util.ArrayList;
 import java.util.List;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
 import io.reactivex.Observable;
 import io.reactivex.ObservableSource;
 import io.reactivex.Observer;
@@ -33,17 +37,55 @@ import io.reactivex.schedulers.Schedulers;
 public class NetworkingActivity extends AppCompatActivity {
 
     public static final String TAG = NetworkingActivity.class.getSimpleName();
+    @BindView(R.id.map)
+    Button map;
+    @BindView(R.id.zip)
+    Button zip;
+    @BindView(R.id.flatMapAndFilter)
+    Button flatMapAndFilter;
+    @BindView(R.id.take)
+    Button take;
+    @BindView(R.id.flatMap)
+    Button flatMap;
+    @BindView(R.id.flatMapWithZip)
+    Button flatMapWithZip;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_networking);
+        ButterKnife.bind(this);
+        Log.e(TAG, "onCreate: =============" );
+    }
+
+    @OnClick({R.id.map, R.id.zip, R.id.flatMapAndFilter, R.id.take, R.id.flatMap, R.id.flatMapWithZip})
+    public void onViewClicked(View view) {
+        switch (view.getId()) {
+            case R.id.map:
+                map();
+                break;
+            case R.id.zip:
+                zip();
+                break;
+            case R.id.flatMapAndFilter:
+                flatMapAndFilter();
+                break;
+            case R.id.take:
+                take();
+                break;
+            case R.id.flatMap:
+                flatMap();
+                break;
+            case R.id.flatMapWithZip:
+                flatMapWithZip();
+                break;
+        }
     }
 
     /**
      * Map Operator Example
      */
-    public void map(View view) {
+    public void map() {
         Rx2AndroidNetworking.get("https://fierce-cove-29863.herokuapp.com/getAnUser/{userId}")
                 .addPathParameter("userId", "1")
                 .build()
@@ -106,18 +148,25 @@ public class NetworkingActivity extends AppCompatActivity {
     }
 
     /*
-    * This do the complete magic, make both network call
-    * and then returns the list of user who loves both
-    * Using zip operator to get both response at a time
-    */
-    private void findUsersWhoLovesBoth() {
+       * This do the complete magic, make both network call
+       * and then returns the list of user who loves both
+       * Using zip operator to get both response at a time
+       */
+    public void zip() {
         // here we are using zip operator to combine both request
         Observable.zip(getCricketFansObservable(), getFootballFansObservable(),
                 new BiFunction<List<User>, List<User>, List<User>>() {
                     @Override
                     public List<User> apply(List<User> cricketFans, List<User> footballFans) throws Exception {
-                        List<User> userWhoLovesBoth =
-                                filterUserWhoLovesBoth(cricketFans, footballFans);
+                        //看看谁两者都喜欢
+                        List<User> userWhoLovesBoth = new ArrayList<>();
+                        for (User cricketFan : cricketFans) {
+                            for (User footballFan : footballFans) {
+                                if (cricketFan.id == footballFan.id) {
+                                    userWhoLovesBoth.add(cricketFan);
+                                }
+                            }
+                        }
                         return userWhoLovesBoth;
                     }
                 })
@@ -150,43 +199,20 @@ public class NetworkingActivity extends AppCompatActivity {
                 });
     }
 
-    private List<User> filterUserWhoLovesBoth(List<User> cricketFans, List<User> footballFans) {
-        List<User> userWhoLovesBoth = new ArrayList<>();
-        for (User cricketFan : cricketFans) {
-            for (User footballFan : footballFans) {
-                if (cricketFan.id == footballFan.id) {
-                    userWhoLovesBoth.add(cricketFan);
-                }
-            }
-        }
-        return userWhoLovesBoth;
-    }
-
-
-    public void zip(View view) {
-        findUsersWhoLovesBoth();
-    }
-
 
     /**
      * flatMap and filter Operators Example
      */
-
-    private Observable<List<User>> getAllMyFriendsObservable() {
-        return Rx2AndroidNetworking.get("https://fierce-cove-29863.herokuapp.com/getAllFriends/{userId}")
+    public void flatMapAndFilter() {
+        Rx2AndroidNetworking.get("https://fierce-cove-29863.herokuapp.com/getAllFriends/{userId}")
                 .addPathParameter("userId", "1")
                 .build()
-                .getObjectListObservable(User.class);
-    }
-
-    public void flatMapAndFilter(View view) {
-        getAllMyFriendsObservable()
-                .flatMap(new Function<List<User>, ObservableSource<User>>() { // flatMap - to return users one by one
-                    @Override
-                    public ObservableSource<User> apply(List<User> usersList) throws Exception {
-                        return Observable.fromIterable(usersList); // returning user one by one from usersList.
-                    }
-                })
+                .getObjectListObservable(User.class).flatMap(new Function<List<User>, ObservableSource<User>>() { // flatMap - to return users one by one
+            @Override
+            public ObservableSource<User> apply(List<User> usersList) throws Exception {
+                return Observable.fromIterable(usersList); // returning user one by one from usersList.
+            }
+        })
                 .filter(new Predicate<User>() {
                     @Override
                     public boolean test(User user) throws Exception {
@@ -225,8 +251,12 @@ public class NetworkingActivity extends AppCompatActivity {
      * take Operator Example
      */
 
-    public void take(View view) {
-        getUserListObservable()
+    public void take() {
+        Rx2AndroidNetworking.get("https://fierce-cove-29863.herokuapp.com/getAllUsers/{pageNumber}")
+                .addPathParameter("pageNumber", "0")
+                .addQueryParameter("limit", "10")
+                .build()
+                .getObjectListObservable(User.class)
                 .flatMap(new Function<List<User>, ObservableSource<User>>() { // flatMap - to return users one by one
                     @Override
                     public ObservableSource<User> apply(List<User> usersList) throws Exception {
@@ -260,13 +290,15 @@ public class NetworkingActivity extends AppCompatActivity {
                 });
     }
 
-
     /**
      * flatMap Operator Example
      */
-
-    public void flatMap(View view) {
-        getUserListObservable()
+    public void flatMap() {
+        Rx2AndroidNetworking.get("https://fierce-cove-29863.herokuapp.com/getAllUsers/{pageNumber}")
+                .addPathParameter("pageNumber", "0")
+                .addQueryParameter("limit", "10")
+                .build()
+                .getObjectListObservable(User.class)
                 .flatMap(new Function<List<User>, ObservableSource<User>>() { // flatMap - to return users one by one
                     @Override
                     public ObservableSource<User> apply(List<User> usersList) throws Exception {
@@ -312,14 +344,6 @@ public class NetworkingActivity extends AppCompatActivity {
      * flatMapWithZip Operator Example
      */
 
-    private Observable<List<User>> getUserListObservable() {
-        return Rx2AndroidNetworking.get("https://fierce-cove-29863.herokuapp.com/getAllUsers/{pageNumber}")
-                .addPathParameter("pageNumber", "0")
-                .addQueryParameter("limit", "10")
-                .build()
-                .getObjectListObservable(User.class);
-    }
-
     private Observable<UserDetail> getUserDetailObservable(long id) {
         return Rx2AndroidNetworking.get("https://fierce-cove-29863.herokuapp.com/getAnUserDetail/{userId}")
                 .addPathParameter("userId", String.valueOf(id))
@@ -327,8 +351,12 @@ public class NetworkingActivity extends AppCompatActivity {
                 .getObjectObservable(UserDetail.class);
     }
 
-    public void flatMapWithZip(View view) {
-        getUserListObservable()
+    public void flatMapWithZip() {
+        Rx2AndroidNetworking.get("https://fierce-cove-29863.herokuapp.com/getAllUsers/{pageNumber}")
+                .addPathParameter("pageNumber", "0")
+                .addQueryParameter("limit", "10")
+                .build()
+                .getObjectListObservable(User.class)
                 .flatMap(new Function<List<User>, ObservableSource<User>>() { // flatMap - to return users one by one
                     @Override
                     public ObservableSource<User> apply(List<User> usersList) throws Exception {
@@ -383,4 +411,6 @@ public class NetworkingActivity extends AppCompatActivity {
                     }
                 });
     }
+
+
 }

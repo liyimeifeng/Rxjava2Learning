@@ -19,7 +19,6 @@
             android:layout_width="match_parent"
             android:layout_height="48dp"
             android:layout_margin="8dp"
-            android:onClick="map"
             android:text="@string/map" />
 
         <Button
@@ -27,7 +26,6 @@
             android:layout_width="match_parent"
             android:layout_height="48dp"
             android:layout_margin="8dp"
-            android:onClick="zip"
             android:text="@string/zip" />
 
         <Button
@@ -35,7 +33,6 @@
             android:layout_width="match_parent"
             android:layout_height="48dp"
             android:layout_margin="8dp"
-            android:onClick="flatMapAndFilter"
             android:text="@string/flatMapAndFilter" />
 
         <Button
@@ -43,7 +40,6 @@
             android:layout_width="match_parent"
             android:layout_height="48dp"
             android:layout_margin="8dp"
-            android:onClick="take"
             android:text="@string/take" />
 
         <Button
@@ -51,7 +47,6 @@
             android:layout_width="match_parent"
             android:layout_height="48dp"
             android:layout_margin="8dp"
-            android:onClick="flatMap"
             android:text="@string/flatMap" />
 
         <Button
@@ -59,7 +54,6 @@
             android:layout_width="match_parent"
             android:layout_height="48dp"
             android:layout_margin="8dp"
-            android:onClick="flatMapWithZip"
             android:text="@string/flatMapWithZip" />
 
     </LinearLayout>
