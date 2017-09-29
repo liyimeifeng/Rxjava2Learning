@@ -29,13 +29,23 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
     <Button
-        android:id="@+id/buffer"
-        android:text="buffer"
+        android:id="@+id/observable_backpressure"
+        android:text="observable_backpressure"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+    <Button
+        android:id="@+id/flowable_backpressure"
+        android:text="flowable_backpressure"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
     <Button
         android:id="@+id/zip"
         android:text="zip"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+    <Button
+        android:id="@+id/disposable"
+        android:text="disposable"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
 </LinearLayout>
