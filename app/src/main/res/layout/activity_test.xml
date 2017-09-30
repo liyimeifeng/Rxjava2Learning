@@ -48,4 +48,19 @@
         android:text="disposable"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
+    <Button
+        android:id="@+id/single"
+        android:text="single"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+    <Button
+        android:id="@+id/with_no_request"
+        android:text="with_no_request"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+    <Button
+        android:id="@+id/BackpressureStrategy.BUFFER"
+        android:text="BackpressureStrategy.BUFFER"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
 </LinearLayout>
